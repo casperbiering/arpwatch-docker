@@ -71,15 +71,18 @@ echo $NULLMAILER_REMOTE > /etc/nullmailer/remotes
 /etc/init.d/nullmailer start
 
 touch /var/lib/arpwatch/arp.dat
-chmod 777 /var/lib/arpwatch/arp.dat
-
 touch /var/lib/arpwatch/arp.dat.new
-chmod 777 /var/lib/arpwatch/arp.dat.new
+chmod -R 777 /var/lib/arpwatch
 
 # run rsyslogd to catch cron messages
+rm -f /var/run/rsyslogd.pid
 rsyslogd -f /rsyslog.conf
 
-${COMMAND}
+if [[ "x$ARPWATCH_DEBUG" == "xyes" ]]; then
+	exec ${COMMAND}
+else
+	${COMMAND}
+fi
 
 while sleep 10; do
   ps aux |grep rsyslog |grep -q -v grep
